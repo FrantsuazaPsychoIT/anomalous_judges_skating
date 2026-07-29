@@ -1,0 +1,22 @@
+name: collusion_judges
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - pip
+  - typer
+  - loguru
+  - tqdm
+  - ipython
+  - jupyterlab
+  - matplotlib
+  - notebook
+  - numpy
+  - pandas
+  - scikit-learn
+  - ruff
+  - pytest
+  - pip:
+    - python-dotenv
+    - mkdocs
+    - -e .

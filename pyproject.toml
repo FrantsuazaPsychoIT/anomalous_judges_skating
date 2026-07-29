@@ -1,0 +1,32 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "collusion_judges"
+version = "0.0.1"
+description = "A methodology for detecting anomalous inter-judge agreement patterns in figure skating using network analysis and unsupervised learning."
+authors = [
+  { name = "Frantsuaza_Li_HSE" },
+]
+license = { file = "LICENSE" }
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License"
+]
+requires-python = "~=3.9.0"
+
+
+[tool.ruff]
+line-length = 99
+src = ["collusion_judges"]
+include = ["pyproject.toml", "collusion_judges/**/*.py"]
+
+[tool.ruff.lint]
+extend-select = ["I"]  # Add import sorting
+
+[tool.ruff.lint.isort]
+known-first-party = ["collusion_judges"]
+force-sort-within-sections = true
+
