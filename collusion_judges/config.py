@@ -20,6 +20,10 @@ FINAL_PATH = DATA_PATH / "final"
 
 WIDE_DF_PATH = PROCESSED_PATH / "wide_dataset.xlsx"
 LONG_DF_PATH = PROCESSED_PATH / "long_dataset.xlsx"
+PRIMARY_GRAPH_PATH = PROCESSED_PATH / "primary_graph.pkl"
+NODES_1_PATH = PROCESSED_PATH / "nodes_2.parquet"
+EDGES_1_PATH = PROCESSED_PATH / "edges_2.parquet"
+GRAPH_1_PATH = PROCESSED_PATH / "graph_2.graphml"
 
 #MODELS_DIR = PROJ_ROOT / "models"
 
