@@ -1,4 +1,4 @@
-# collusion_judges/dataset/aggregate_graph.py
+# collusion_judges/dataset/make_graph_pro.py
 """Build an aggregated judge graph from the primary graph."""
 
 from __future__ import annotations
@@ -14,12 +14,12 @@ import pandas as pd
 
 from collusion_judges.config import (
     PRIMARY_GRAPH_PATH,
-    EDGES_1_PATH,
-    GRAPH_1_PATH,
+    EDGES_2_PATH,
+    GRAPH_2_PATH,
     LONG_DF_PATH,
-    NODES_1_PATH,
+    NODES_2_PATH,
 )
-from collusion_judges.dataset.make_graph import JudgeGraphBuilder
+from collusion_judges.dataset.make_graph_basic import JudgeGraphBuilder
 
 
 class JudgeAggregateGraphBuilder:
@@ -575,7 +575,7 @@ class JudgeAggregateGraphBuilder:
 
     def create_nodes_dataframe(
         self,
-        path: str | Path = NODES_1_PATH,
+        path: str | Path = NODES_2_PATH,
     ) -> pd.DataFrame:
         """Create and save the node-level DataFrame as Parquet."""
         rows = []
@@ -624,7 +624,7 @@ class JudgeAggregateGraphBuilder:
 
     def create_edges_dataframe(
         self,
-        path: str | Path = EDGES_1_PATH,
+        path: str | Path = EDGES_2_PATH,
     ) -> pd.DataFrame:
         """Create and save the simplified edge DataFrame as Parquet."""
         rows = []
@@ -701,7 +701,7 @@ class JudgeAggregateGraphBuilder:
 
     def save_graph(
         self,
-        path: str | Path = GRAPH_1_PATH,
+        path: str | Path = GRAPH_2_PATH,
     ) -> None:
         """Save the aggregated graph as GraphML, GEXF, or pickle."""
         output_path = Path(path)
@@ -795,9 +795,9 @@ def build_aggregated_judge_graph(
     long_df: pd.DataFrame | None = None,
     score_cols: dict[str, str] | None = None,
     corr_types: Sequence[str] = ("pearson",),
-    graph_path: str | Path = GRAPH_1_PATH,
-    nodes_path: str | Path = NODES_1_PATH,
-    edges_path: str | Path = EDGES_1_PATH,
+    graph_path: str | Path = GRAPH_2_PATH,
+    nodes_path: str | Path = NODES_2_PATH,
+    edges_path: str | Path = EDGES_2_PATH,
 ) -> tuple[nx.Graph, pd.DataFrame]:
     """
     Build and save the aggregated judge graph.

@@ -15,15 +15,19 @@ DATA_PATH = PROJ_ROOT / "data"
 
 EXTERNAL_PATH = DATA_PATH / "external"
 INTERIM_PATH = DATA_PATH / "interim"
-PROCESSED_PATH = DATA_PATH / "processed"
-FINAL_PATH = DATA_PATH / "final"
 
+PRIMARY_GRAPH_PATH = INTERIM_PATH / "graph" / "primary_graph.pkl"
+NODES_2_PATH = INTERIM_PATH / "graph" / "nodes_2.parquet"
+EDGES_2_PATH = INTERIM_PATH / "graph" / "edges_2.parquet"
+GRAPH_2_PATH = INTERIM_PATH / "graph" / "graph_2.graphml"
+
+PROCESSED_PATH = DATA_PATH / "processed"
 WIDE_DF_PATH = PROCESSED_PATH / "wide_dataset.xlsx"
 LONG_DF_PATH = PROCESSED_PATH / "long_dataset.xlsx"
-PRIMARY_GRAPH_PATH = PROCESSED_PATH / "primary_graph.pkl"
-NODES_1_PATH = PROCESSED_PATH / "nodes_2.parquet"
-EDGES_1_PATH = PROCESSED_PATH / "edges_2.parquet"
-GRAPH_1_PATH = PROCESSED_PATH / "graph_2.graphml"
+NODES_3_PATH = PROCESSED_PATH / "nodes_3.parquet"
+
+FINAL_PATH = DATA_PATH / "final"
+
 
 #MODELS_DIR = PROJ_ROOT / "models"
 
