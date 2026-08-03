@@ -35,6 +35,7 @@ FIGURES_PATH = PROJ_ROOT / "reports" / "figures"
 CORR_FIG_PATH = FIGURES_PATH / "Dist_corr_new"
 EXPLANATORY_FIG_PATH = FIGURES_PATH / "explanatory"
 JUDGES_DESCR_FIG_PATH = FIGURES_PATH / "judges"
+ANOMALY_FIGURES_PATH = FIGURES_PATH / "anomaly_description"
 
 # -------------------- HTTP / parser settings --------------------
 
