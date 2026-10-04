@@ -25,6 +25,7 @@ PROCESSED_PATH = DATA_PATH / "processed"
 WIDE_DF_PATH = PROCESSED_PATH / "wide_dataset.xlsx"
 LONG_DF_PATH = PROCESSED_PATH / "long_dataset.xlsx"
 NODES_3_PATH = PROCESSED_PATH / "nodes_3.parquet"
+NODES_4_PATH = PROCESSED_PATH / "nodes_4.parquet"
 
 FINAL_PATH = DATA_PATH / "final"
 
