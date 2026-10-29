@@ -3,6 +3,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from loguru import logger
+from tqdm.auto import tqdm
 
 # Load environment variables from .env file if it exists
 load_dotenv()
@@ -26,9 +27,10 @@ WIDE_DF_PATH = PROCESSED_PATH / "wide_dataset.xlsx"
 LONG_DF_PATH = PROCESSED_PATH / "long_dataset.xlsx"
 NODES_3_PATH = PROCESSED_PATH / "nodes_3.parquet"
 NODES_4_PATH = PROCESSED_PATH / "nodes_4.parquet"
+NODES_5_PATH = PROCESSED_PATH / "nodes_5_long.parquet"
+COMPARE_1_PATH = PROCESSED_PATH / "compare_anom_1.parquet"
 
 FINAL_PATH = DATA_PATH / "final"
-
 
 #MODELS_DIR = PROJ_ROOT / "models"
 
@@ -48,13 +50,14 @@ DEFAULT_HEADERS: dict[str, str] = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
 }
 
+CORR_TYPES = ("pearson", "kendall", "spearman")
+SCORE_TYPES = ("components", "technique")
+
 
 # If tqdm is installed, configure loguru with tqdm.write
 # https://github.com/Delgan/loguru/issues/135
 try:
-    from tqdm import tqdm
-
-    logger.remove(0)
+    logger.remove()
     logger.add(lambda msg: tqdm.write(msg, end=""), colorize=True)
 except ModuleNotFoundError:
     pass
