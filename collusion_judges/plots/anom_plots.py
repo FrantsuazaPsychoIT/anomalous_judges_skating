@@ -2,14 +2,16 @@
 
 from __future__ import annotations
 
-from itertools import combinations
 from pathlib import Path
+from itertools import combinations
+from matplotlib.lines import Line2D
+
 
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
-from collusion_judges.config import ANOMALY_FIGURES_PATH
+from collusion_judges.config import ANOMALY_FIGURES_PATH, CORR_TYPES, SCORE_TYPES
 
 
 CORR_TYPES = ("pearson", "kendall", "spearman")
@@ -365,3 +367,145 @@ def anomaly_2d(
                 ax_names=ax_names,
                 path=output_path,
             )
+# ---------------------------------------------------------------------
+# Compare top anomalies and other
+# ---------------------------------------------------------------------
+
+
+def make_plots_for_corr_top_other(
+    df, corr_type='pearson', score_types=SCORE_TYPES,
+    label_fontsize=7, label_country=True,
+):
+    data = df[df['corr_type'] == corr_type].copy()
+
+    fig, axes = plt.subplots(
+        2, 2, figsize=(11, 10), sharex=True, sharey=True,
+    )
+    fig.suptitle(f'{corr_type}: mean corr vs rank by mean')
+
+    for i, top in enumerate((5, 10)):
+        for j, score_type in enumerate(score_types):
+            subset = data[data['score_type'] == score_type].copy()
+            in_top = subset['anom_rank'] <= top
+
+            ax = axes[i, j]
+
+            ax.scatter(
+                subset['mean'], subset['rank_by_mean'],
+                c=in_top.map(ANOMALY_PALETTE),
+                alpha=0.85, edgecolor='white', linewidth=0.3, s=40,
+            )
+
+            for _, r in subset[in_top].iterrows():
+                if pd.isna(r['name']):
+                    continue
+                if label_country and pd.notna(r.get('country')):
+                    label = f"{r['name']} ({r['country']})"
+                else:
+                    label = str(r['name'])
+
+                ax.annotate(
+                    label,
+                    xy=(r['mean'], r['rank_by_mean']),
+                    xytext=(4, 4), textcoords='offset points',
+                    fontsize=label_fontsize,
+                    color=ANOMALY_PALETTE[True],
+                    alpha=0.95, ha='left', va='bottom',
+                    clip_on=True,
+                )
+
+            ax.set_title(f'Top{top} vs other: by {score_type}')
+            ax.set_xlabel('median mean corr in panel')
+            ax.set_ylabel('median rank by mean in panel')
+
+            handles = [
+                Line2D([0], [0], marker='o', color='w',
+                       markerfacecolor=ANOMALY_PALETTE[True], markersize=8,
+                       label=f'in Top{top} (by {score_type})'),
+                Line2D([0], [0], marker='o', color='w',
+                       markerfacecolor=ANOMALY_PALETTE[False], markersize=8,
+                       label='other'),
+            ]
+            ax.legend(handles=handles, loc='best', fontsize=8)
+
+    plt.tight_layout()
+    plt.show()
+
+
+def make_plots_for_corr_tech_comp(df, corr_type='pearson', score_types=SCORE_TYPES,
+                        keys=('name', 'country'), label_fontsize=7):
+    data = df[df['corr_type'] == corr_type].copy()
+
+    comp = data[data['score_type'] == score_types[0]].set_index(list(keys))
+    tech = data[data['score_type'] == score_types[1]].set_index(list(keys))
+
+    merged = comp[['anom_rank', 'mean', 'rank_by_mean']].join(
+        tech[['anom_rank', 'mean', 'rank_by_mean']],
+        lsuffix='_comp', rsuffix='_tech', how='inner'
+    ).reset_index()
+    # ↑ здесь уже есть столбцы 'name' и 'country'
+
+    if merged.empty:
+        print(f'[{corr_type}] после merge пусто — проверьте ключи {keys}')
+        return
+
+    fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+    fig.suptitle(f'{corr_type}: components vs technique', fontsize=14)
+
+    for i, top in enumerate((5, 10)):
+        in_top = (merged['anom_rank_comp'] <= top) | (merged['anom_rank_tech'] <= top)
+        colors = in_top.map(ANOMALY_PALETTE)
+
+        for j, col in enumerate(['mean', 'rank_by_mean']):
+            ax = axes[i, j]
+            x = merged[f'{col}_comp']
+            y = merged[f'{col}_tech']
+
+            ax.scatter(x, y, c=colors, alpha=0.85,
+                       edgecolor='white', linewidth=0.3, s=40)
+
+            # ---- подписи только аномальных точек ----
+            for _, r in merged[in_top].iterrows():
+                if pd.isna(r['name']):
+                    continue
+                ax.annotate(
+                    str(r['name']),
+                    xy=(r[f'{col}_comp'], r[f'{col}_tech']),
+                    xytext=(4, 4), textcoords='offset points',
+                    fontsize=label_fontsize,
+                    color=ANOMALY_PALETTE[True],
+                    alpha=0.95, ha='left', va='bottom',
+                    clip_on=True,
+                )
+
+            # диагональ y = x
+            lo = min(x.min(), y.min())
+            hi = max(x.max(), y.max())
+            ax.plot([lo, hi], [lo, hi], '--', color='gray', alpha=0.5)
+
+            ax.set_xlabel(f'{col} (components)')
+            ax.set_ylabel(f'{col} (technique)')
+            sub = 'mean corr' if col == 'mean' else 'mean rank'
+            ax.set_title(f'Top{top}: {sub}')
+
+            handles = [
+                Line2D([0], [0], marker='o', color='w',
+                       markerfacecolor=ANOMALY_PALETTE[True], markersize=8,
+                       label=f'in Top{top} (any method)'),
+                Line2D([0], [0], marker='o', color='w',
+                       markerfacecolor=ANOMALY_PALETTE[False], markersize=8,
+                       label='остальные'),
+            ]
+            ax.legend(handles=handles, loc='best', fontsize=8)
+
+    plt.tight_layout()
+    plt.show()
+
+
+def iterate_plots(df, corr_types=CORR_TYPES, score_types=SCORE_TYPES, mode='top_other'):
+    for corr_type in corr_types:
+        if mode == 'top_other':
+            make_plots_for_corr_top_other(df, corr_type=corr_type, score_types=score_types)
+        elif mode == 'tech_comp':
+            make_plots_for_corr_tech_comp(df, corr_type=corr_type, score_types=score_types)
+

@@ -303,3 +303,32 @@ def make_html_df_link(
     html = f'<a download="{escape(filename, quote=True)}" href="data:text/csv;base64,{encoded}">{escape(label)}</a>'
 
     display(HTML(html))
+
+
+"""Сравнительная таблица аномальных и обычных судей по score_type."""
+
+def pivot_group_comparison(summary_df, corr_type='pearson', cols=['Group', 'score_type', 'n_events', 'mean', 'mad', 'rank_by_mean']):
+    typical = summary_df.loc[summary_df["corr_type"] == corr_type, cols].copy()
+
+    wide = typical.pivot_table(
+        index=["Group", "n_events"],
+        columns="score_type",
+        values=["mean", "mad", "rank_by_mean"],
+        aggfunc="first",
+    ).swaplevel(0, 1, axis=1)
+
+    score_types = sorted(typical["score_type"].unique())
+    metric_order = ["mean", "mad", "rank_by_mean"]
+    wide = wide.reindex(
+        columns=pd.MultiIndex.from_tuples(
+            [(st, m) for st in score_types for m in metric_order],
+            names=["score_type", "metric"],
+        )
+    )
+
+    wide = wide.reset_index()
+    wide.columns = pd.MultiIndex.from_tuples(
+        [("group_description", a) if b == "" else (a, b) for a, b in wide.columns],
+        names=["score_type", "metric"],
+    )
+    return wide
